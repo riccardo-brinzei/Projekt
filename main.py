@@ -24,8 +24,9 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+            
 
-    # --- NEU: Bewegungslogik ---
+    # ---  Bewegungslogik ---
     keys = pygame.key.get_pressed()
     
     if keys[pygame.K_w]: # Nach oben
@@ -36,7 +37,7 @@ while True:
         player_x -= player_speed
     if keys[pygame.K_d]: # Nach rechts
         player_x += player_speed
-    # ---------------------------
+    # ------------------------
 
     screen.blit(background_surface, (0, 0))
     screen.blit(player_surface, (player_x, player_y))
