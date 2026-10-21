@@ -3,7 +3,7 @@ from sys import exit
 
 pygame.init()
 
-screen = pygame.display.set_mode((1000, 1000), pygame.RESIZABLE)
+screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
 pygame.display.set_caption("RPG Projekt")
 
 clock = pygame.time.Clock()
@@ -38,6 +38,12 @@ while True:
     if keys[pygame.K_d]: # Nach rechts
         player_x += player_speed
     # ------------------------
+
+
+    if player_x < 0:
+        player_x = 0
+    if player_y < 0:
+        player_y = 0
 
     screen.blit(background_surface, (0, 0))
     screen.blit(player_surface, (player_x, player_y))
