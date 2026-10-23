@@ -1,52 +1,63 @@
 import pygame
 from sys import exit
 
-pygame.init()
+def main():
+    pygame.init()
 
-screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
-pygame.display.set_caption("RPG Projekt")
+    SCREEN_WIDTH = 800
+    SCREEN_HEIGHT = 600
 
-clock = pygame.time.Clock()
-
-background_surface = pygame.image.load("Bilder/test_room.png").convert()
-player_surface = pygame.image.load("Bilder/test_front.png").convert_alpha()
-
-player_x = 400
-player_y = 400
+    CHARACTER_WIDTH = 35
+    CHARACTER_HEIGHT = 64
 
 
-player_speed = 5 
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+    pygame.display.set_caption("Mein Spiel")
 
 
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-            
-
-    # ---  Bewegungslogik ---
-    keys = pygame.key.get_pressed()
-    
-    if keys[pygame.K_w]: # Nach oben
-        player_y -= player_speed
-    if keys[pygame.K_s]: # Nach unten
-        player_y += player_speed
-    if keys[pygame.K_a]: # Nach links
-        player_x -= player_speed
-    if keys[pygame.K_d]: # Nach rechts
-        player_x += player_speed
-    # ------------------------
+    player_surface = pygame.image.load("Bilder/test_front.png").convert_alpha()
+    player_surface = pygame.transform.scale(player_surface, (CHARACTER_WIDTH, CHARACTER_HEIGHT))
+    player_rect = player_surface.get_rect(topleft=(400, 400))
 
 
-    if player_x < 0:
-        player_x = 0
-    if player_y < 0:
-        player_y = 0
+    player_speed = 5
 
-    screen.blit(background_surface, (0, 0))
-    screen.blit(player_surface, (player_x, player_y))
 
-    pygame.display.update()
-    clock.tick(60)
+    running = True
+    clock = pygame.time.Clock()
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        keys =pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            player_rect.y -= player_speed
+        if keys[pygame.K_s]:
+            player_rect.y += player_speed
+        if keys[pygame.K_a]:
+            player_rect.x -= player_speed
+        if keys[pygame.K_d]:
+            player_rect.x += player_speed
+
+        if player_rect.left < 0:
+            player_rect.left = 0
+        if player_rect.top < 0:
+            player_rect.top = 0
+        if player_rect.right > SCREEN_WIDTH:
+            player_rect.right = SCREEN_WIDTH
+        if player_rect.bottom > SCREEN_HEIGHT:
+            player_rect.bottom = SCREEN_HEIGHT
+
+
+        screen.fill("black")
+        screen.blit(player_surface, player_rect)
+        pygame.display.update()
+        clock.tick(60)
+
+    pygame.quit()
+    exit()
+
+if __name__ == "__main__":
+    main()
+
