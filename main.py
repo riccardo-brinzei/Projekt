@@ -1,40 +1,39 @@
 import pygame
-from sys import exit
+
 from player import Player
+
+SCREEN_SIZE = (800, 600)
+FPS = 60
+MAX_DT = 0.05  
 
 def main():
     pygame.init()
-
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
-
-
-
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+    screen = pygame.display.set_mode(SCREEN_SIZE, pygame.RESIZABLE)
     pygame.display.set_caption("Mein Spiel")
-    my_player = Player(SCREEN_WIDTH, SCREEN_HEIGHT)
+    clock = pygame.time.Clock()
 
-
+    player = Player()
 
     running = True
-    clock = pygame.time.Clock()
     while running:
+
+        dt = min(clock.tick(FPS) / 1000, MAX_DT)
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        my_player.update()
 
+        player.update(dt, screen.get_rect())
 
 
         screen.fill("black")
-        screen.blit(my_player.image, my_player.rect)
-        pygame.display.update()  
-        clock.tick(60)
+        player.draw(screen)
+        pygame.display.flip()
 
     pygame.quit()
-    exit()
+
 
 if __name__ == "__main__":
     main()
-

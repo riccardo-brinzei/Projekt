@@ -1,65 +1,77 @@
+from pathlib import Path
+
 import pygame
 
-CHARACTER_WIDTH = 35
-CHARACTER_HEIGHT = 64
+CHARACTER_SIZE = (35, 64)
+PLAYER_WALKING_SPEED = 250  
+IMAGE_DIR = Path(__file__).parent / "Bilder"
+PLAYER_RUNNING_SPEED = 500
+
+SPRITE_FILES = {
+    "down": "test_front.png",
+    "up": "test_back.png",
+    "left": "test_left.png",
+    "right": "test_right.png",
+}
+
 
 class Player:
+    def __init__(self, start_pos=(400, 400)):
 
-    def __init__(self, screen_width, screen_height):
-
-        img_front = pygame.image.load("Bilder/test_front.png").convert_alpha()
-        img_back = pygame.image.load("Bilder/test_back.png").convert_alpha()
-        img_left = pygame.image.load("Bilder/test_left.png").convert_alpha()
-        img_right = pygame.image.load("Bilder/test_right.png").convert_alpha()
-
- 
         self.sprites = {
-            "down": pygame.transform.scale(img_front, (CHARACTER_WIDTH, CHARACTER_HEIGHT)),
-            "up": pygame.transform.scale(img_back, (CHARACTER_WIDTH, CHARACTER_HEIGHT)),
-            "left": pygame.transform.scale(img_left, (CHARACTER_WIDTH, CHARACTER_HEIGHT)),
-            "right": pygame.transform.scale(img_right, (CHARACTER_WIDTH, CHARACTER_HEIGHT))
+            direction: pygame.transform.scale(
+                pygame.image.load(IMAGE_DIR / filename).convert_alpha(),
+                CHARACTER_SIZE,
+            )
+            for direction, filename in SPRITE_FILES.items()
         }
 
-
         self.direction = "down"
+        self.image = self.sprites[self.direction]
+        self.speed = PLAYER_WALKING_SPEED
 
-        
-        self.rect = self.image.get_rect(topleft=(400, 400))
-        
-        self.speed = 5
-        self.screen_width = screen_width
-        self.screen_height = screen_height
+        self.rect = self.image.get_rect(topleft=start_pos)
+        self.pos = pygame.Vector2(self.rect.topleft)
 
-    def update(self):
+    def update(self, dt, bounds):
         keys = pygame.key.get_pressed()
 
 
+        move = pygame.Vector2(0, 0)
 
+        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+            self.speed = PLAYER_RUNNING_SPEED
+        else:
+            self.speed = PLAYER_WALKING_SPEED
+        # for debugging, use stuf flike: print(self.speed)
+
+        
         if keys[pygame.K_w]:
-            self.rect.y -= self.speed
+            move.y -= 1
             self.direction = "up"
-
         if keys[pygame.K_s]:
-            self.rect.y += self.speed
+            move.y += 1
             self.direction = "down"
-
         if keys[pygame.K_a]:
-            self.rect.x -= self.speed
-            self.direction = "left"     
-
+            move.x -= 1
+            self.direction = "left"
         if keys[pygame.K_d]:
-            self.rect.x += self.speed
+            move.x += 1
             self.direction = "right"
 
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.right > self.screen_width:
-            self.rect.right = self.screen_width
-        if self.rect.bottom > self.screen_height:
-            self.rect.bottom = self.screen_height
 
+
+        if move.length_squared() > 0:
+            move.normalize_ip()
+            self.pos += move * self.speed * dt
+
+
+        self.pos.x = max(bounds.left, min(self.pos.x, bounds.right - self.rect.width))
+        self.pos.y = max(bounds.top, min(self.pos.y, bounds.bottom - self.rect.height))
+
+
+        self.rect.topleft = self.pos
         self.image = self.sprites[self.direction]
 
-    pass
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
